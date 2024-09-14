@@ -74,6 +74,17 @@ pair<vector<vector<double>>, double> GetProblemVectorWithError() {
 
 }
 
+void SaveRelaxationResults(vector <vector <double>> relaxResults) {
+    json j;
+
+    for (const auto relaxIter : relaxResults)
+        j["plot"].push_back({ { "relaxation", relaxIter[0] }, {"iterations", relaxIter[1]} });
+    
+    ofstream file("plot.json");
+    file << j;
+    file.close();
+}
+
 
 
 int main()
@@ -86,11 +97,14 @@ int main()
 
     ShowProblemVector(PROBLEM_VECTOR);
 
-    vector <int> relaxResults;
+    vector < vector <double> > relaxResults;
     vector <double> xAnswers;
     double maxError;
 
     for (double relaxParam = DEF_RELAX; relaxParam <= MAX_RELAX; relaxParam += RELAX_STEP) {
+
+        vector <double> relaxIter;
+        relaxIter.push_back(relaxParam);
 
         x.assign(x.size(), 0); // обнуляем результаты поиска решений для новой итерации
 
@@ -129,16 +143,20 @@ int main()
 
         if ( (counter != -1) && (xAnswers.empty() == true) ) xAnswers = x;
 
-        relaxResults.push_back(counter);
+        relaxIter.push_back(counter);
+        relaxResults.push_back(relaxIter);
     }
 
-    double relaxParam = DEF_RELAX;
-    for (int i = 0; i < relaxResults.size(); i++, relaxParam +=RELAX_STEP) {
-        cout << "Relaxation param = " << relaxParam << " Total iterations: " << ( (relaxResults[i] != -1) ? to_string(relaxResults[i]) : "No progress" )<< endl;
+
+    for (vector <double> relaxIter : relaxResults) {
+        cout << "Relaxation param = " << relaxIter[0] << " Total iterations: " << ((relaxIter[1] != -1) ? to_string( static_cast<int>(relaxIter[1]) ) : "No progress") << endl;
     }
 
     cout << "Answers: " << endl;
     for (int i = 0; i < xAnswers.size(); i++)
         cout << "x" << i + 1 << ": " << xAnswers[i] << endl;
+
+    SaveRelaxationResults(relaxResults);
+    system("python plot_graph.py");
 
 }
