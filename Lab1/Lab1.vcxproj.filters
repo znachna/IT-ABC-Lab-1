@@ -28,4 +28,8 @@
   <ItemGroup>
     <Text Include="ProblemMatrix.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="config.json" />
+  </ItemGroup>
 </Project>

@@ -2,11 +2,42 @@
 #include <string>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
 
 import MatrixFromFile;
 import MatrixFromConsole;
-    
+
 using namespace std;
+using json = nlohmann::json;
+
+struct RelaxParams {
+
+    double const DEF_RELAX;
+    double const MAX_RELAX;
+    double const RELAX_STEP;
+
+};
+
+RelaxParams ReadConfig() {
+
+    const string fileName = "config.json";
+
+    ifstream file(fileName);
+
+    if (!file.is_open()) {
+        return { 0.2, 1.0, 0.2 };  // Значения по умолчанию
+    }
+
+    json configJson;
+    file >> configJson;
+
+
+    return { configJson.value("DEF_RELAX", 0.2), configJson.value("MAX_RELAX", 2.0), configJson.value("RELAX_STEP", 0.2) } ;
+}
+
+
 
 void ShowProblemVector(vector <vector <double>> problemVector) {
 
@@ -47,11 +78,7 @@ pair<vector<vector<double>>, double> GetProblemVectorWithError() {
 
 int main()
 {
-
-    double const DEF_RELAX = 0.2;
-    double const MAX_RELAX = 2;
-    double const RELAX_STEP = 0.2;
-
+    const auto [DEF_RELAX, MAX_RELAX, RELAX_STEP] = ReadConfig();
     const auto [PROBLEM_VECTOR, FINAL_ERROR] = GetProblemVectorWithError();
 
     vector <double> x(PROBLEM_VECTOR.size());

@@ -1,0 +1,5 @@
+{
+  "DEF_RELAX": 0.2,
+  "MAX_RELAX": 2.0,
+  "RELAX_STEP": 0.2
+}
